@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<link type="text/css" rel="stylesheet" href="project.css"/>		 <!--Linking HTML to CSS-->
+		<title>Space Block Bash!</title>
+		<style>															<!--Styles the canvas-->
+			* {padding: 0; margin: 0;}
+			canvas {background: #000; display: block; margin: 0 auto;}
+		</style>
+	</head>
+	<body>
+	<canvas id ="myCanvas" width="480" height="320"></canvas>			<!--Creates dimensions of canvas-->	
+		<script>		
+			<!--All Variables Declared Here-->
+                        
+			var lives = 3
+			var canvas = document.getElementById("myCanvas");                                       	<!--Stores the canvas-->
+			var ctx = canvas.getContext("2d");                                                          	<!--Stores "2d" rendering context/lets you draw on canvas-->
+			var ballRadius = 10;										<!--Stores change of ball radius per redraw-->
+			var x = canvas.width/2										<!--Stores x variable-->
+			var y = canvas.height-30;									<!--Stores y variable-->
+			var dx = 2;											<!--Stores change of x per redraw-->
+			var dy = -2;                    								<!--Stores change of y per redraw-->
+			var paddleHeight = 10;										<!--Stores paddle height-->
+			var paddleWidth = 75;										<!--Stores paddle width-->
+			var paddleX = (canvas.width-paddleWidth)/2;                             			<!--Stores variable for paddle's origin-->
+			var rightPressed = false;									<!--Stores variable for right arrow-->
+			var leftPressed = false;									<!--Stores variable for left arrow-->
+			var brickRowCount = 3;										<!--Stores variable for brick rows-->
+			var brickColumnCount = 5;									<!--Stores variable for brick columns-->
+			var brickWidth = 75;										<!--Stores variable for brick width-->
+			var brickHeight = 20;										<!--Stores variable for brick height-->
+			var brickPadding = 10;										<!--Stores variable for padding between bricks-->
+			var brickOffsetTop = 30;									<!--Stores variable for distance from top of canvas--> 
+			var brickOffsetLeft = 30;									<!--Stores variable for distance from left of canvas-->
+			var score = 0;
+			
+			var bricks = [];											
+				for(c=0; c<brickColumnCount; c++) {
+					bricks[c] = [];
+					for(r=0; r<brickRowCount; r++) {
+						bricks[c][r] = { x: 0, y: 0, status: 1 };
+			}
+		}
+			document.addEventListener("keydown", keyDownHandler, false);                                    <!--Listens for key depress-->
+			document.addEventListener("keyup", keyUpHandler, false);                                	<!--Listens for key release-->
+
+			function keyDownHandler(e) {								<!--Function stores data for key depress--> 
+				if(e.keyCode == 39) {									<!--If right button is depressed-->
+					rightPressed = true;								<!--rightPressed is assigned true-->
+				}
+				else if(e.keyCode == 37) {								<!--If left button is depressed-->
+					leftPressed = true;									<!--leftPressed is assigned true-->
+				}
+			}
+			function keyUpHandler(e) {									<!--Function stores data for key release-->
+				if(e.keyCode == 39) {									<!--If right button is released-->
+					rightPressed = false;								<!--rightpressed is assigned false-->
+				}
+				else if (e.keyCode == 37) {								<!--if left button is released-->
+					leftPressed = false;								<!--leftPressed is assigned false-->
+				}
+			}
+			function collisionDetection() {
+				for(c=0; c<brickColumnCount; c++) {
+				for(r=0; r<brickRowCount; r++) {
+				var b = bricks[c][r];
+				if(b.status == 1) {
+					if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+						dy = -dy;
+						b.status = 0;
+						score++;
+						if(score ==brickRowCount*brickColumnCount) {
+							alert("You win, congratulations!");
+							document.location.reload();
+					}
+             }
+           }
+         }
+       }
+    }
+			function drawlives(){
+				ctx.font = "16px Arial";
+				ctx.fillStyle= "#0095DD";
+				ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+				}
+    
+			function drawScore() {
+				ctx.font = "16px Arial";
+				ctx.fillStyle = "#0095DD";
+				ctx.fillText("Score: "+score, 8, 20);
+			}
+
+			function drawBall() {										<!--Declares a function that draws the ball-->
+				ctx.beginPath();										<!--Begin drawing-->
+				ctx.arc(x, y, ballRadius, 0, Math.PI*2);				<!--Gives paramenters of the circle's shape. Also calls on x and y for reference of changing axes during movement-->
+				ctx.fillStyle = "#FFFFFF";								<!--Reference for ball color-->
+				ctx.fill();												<!--Colors ball-->
+				ctx.closePath();										<!--Ends drawing-->
+				}														
+			function drawPaddle() {										<!--Declares function that draws the paddle-->
+				ctx.beginPath();										<!--Begin drawing-->
+				ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight); <!--Creates rectangle and calls on variables for dimensions-->
+				ctx.fillStyle = "#157315";								<!--Paddle color-->
+				ctx.fill();												<!--Colors paddle-->
+				ctx.closePath();										<!--Ends drawing-->
+			}
+			function drawBricks() {										<!--Declares function that draws the bricks-->
+				for(c=0; c<brickColumnCount; c++) {						
+				for(r=0; r<brickRowCount; r++) {
+					if(bricks[c][r].status == 1) {
+                var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+                var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+                bricks[c][r].x = brickX;
+                bricks[c][r].y = brickY;
+                ctx.beginPath();
+                ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                ctx.fillStyle = "#0095DD";
+                ctx.fill();
+                ctx.closePath();
+            }											
+        }
+    }
+}
+			function draw(){											<!--Declares a function that makes ball move-->
+			ctx.clearRect(0, 0, canvas.width, canvas.height);			<!--Clears canvas on redraw-->
+			drawBall();													<!--Calls drawBall function-->
+			drawPaddle();												<!--Calls drawPaddle function-->
+			drawBricks();			
+			collisionDetection();
+			drawScore();
+				if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {	<!--If ball radius x value > canvas width or 0-->
+					dx = -dx;											<!--Then reverse value of x per redraw-->
+			}
+				if(y + dy < ballRadius) {
+					dy = -dy;											<!--reverse value of y per redraw-->
+			}	else if (y + dy > canvas.height-ballRadius) {
+				if(x > paddleX && x < paddleX + paddleWidth) {
+				dy= -dy;
+			}
+				else {
+				alert("YOU LOSE!");
+				document.location.reload();
+			}
+	}
+				if(rightPressed && paddleX < canvas.width-paddleWidth) {<!--Input when right button depressed / Prevents paddle from running off screen-->
+			paddleX += 7;												<!--Rate of paddle change right-->
+		}
+			else if(leftPressed && paddleX > 0) {						<!--Input when right button depressed / Prevents paddle from running off screen-->
+			paddleX -= 7;												<!--Rate of paddle change left-->
+		}	
+		
+		x += dx;														<!--Adds value of variable dx on redraw--> 
+		y += dy;														<!--Adds value of variable dy on redraw-->													
+	}
+			setInterval(draw, 10);										<!--Redraws frame every 10 miliseconds-->
+				</script>
+		<p>Welcome to the JavaScript arcade! In order to fully enhance your arcade experience,
+		JavaScript should be enabled and you should be using an updated browser. "<i>Space Block Bash!</i>" 
+		was created by David Kolesar in June of 2016. Code may be distributed if proper credit is given.</p>		
+		
+		<div class="left">							<!--Left element-->
+			<ul style="list-style-type:none">
+				<li><a href="www.google.com">About<a/></li>
+				<li><br></li>
+				<li><a href="www.google.com">Contact<a/></li>
+				<li><br></li>
+				<li><a href="www.google.com">FAQ<a/></li>
+			</ul>
+		</div>
+		<div class="right"></div>						<!--Right element-->
+         	<div class="footer"></div>						<!--Footer-->   
+	</body>
+</html>

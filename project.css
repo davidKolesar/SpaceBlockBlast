@@ -1,0 +1,46 @@
+canvas{
+margin: auto;
+top: 100px;
+}
+body {
+background-image: url("http://assets.alienaa.com/images/landing/star-tile-bg-1.png");
+background-repeat: repeat;
+font-family: Futuro Verdana;
+color:	#D9D9F4;
+text-align: justify;
+padding-left: 300px;
+padding-right: 300px;
+}
+.left {
+position: absolute;
+top: 5px;
+left: 5px;
+background-color:#303030;
+height: 97%;
+width: 10%;
+border-top-left-radius: 15px;
+border-bottom-left-radius: 15px;
+color:black;
+}
+.right {
+position:absolute;
+top: 5px;
+right:5px;
+background-color:#303030;
+height: 97%;
+width: 10%;
+border-bottom-right-radius: 15px;
+border-top-right-radius: 15px;
+}
+a {
+text-decoration: none;
+color: #D9D9F4;
+}
+a:hover {
+font-weight: bold;
+text-shadow: 2px 2px #212121;
+}
+table {
+margin: auto;
+text-align: center;
+}
